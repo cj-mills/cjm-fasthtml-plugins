@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "cjm-fasthtml-plugins"
+  site-url: "https://cj-mills.github.io/cjm-fasthtml-plugins"
+  description: "FastHTML plugin registry with persistence, categories, and settings UI integration for managing application plugins."
+  repo-branch: main
+  repo-url: "https://github.com/cj-mills/cjm-fasthtml-plugins"
