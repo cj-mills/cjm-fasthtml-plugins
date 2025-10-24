@@ -17,45 +17,12 @@ from .execution_mode import PluginExecutionMode
 T = TypeVar('T')
 
 class UnifiedPluginRegistry:
-    """Unified registry for multiple domain-specific plugin systems.
+    """Unified registry for multiple domain-specific plugin systems with configuration persistence."""
     
-    Manages plugin managers from different domains (transcription, LLM, etc.)
-    and provides a single interface for plugin discovery, configuration,
-    and resource management.
-    
-    Example:
-        ```python
-        from cjm_plugin_system.core.manager import PluginManager
-        from cjm_transcription_plugin_system.plugin_interface import TranscriptionPlugin
-        
-        # Create registry
-        registry = UnifiedPluginRegistry()
-        
-        # Register transcription plugins
-        transcription_mgr = PluginManager(plugin_interface=TranscriptionPlugin)
-        registry.register_plugin_manager(
-            category="transcription",
-            manager=transcription_mgr,
-            display_name="Transcription"
-        )
-        
-        # Get all plugins
-        all_plugins = registry.get_all_plugins()
-        
-        # Get plugins by category
-        transcription_plugins = registry.get_plugins_by_category("transcription")
-        
-        # Get manager for specific operations
-        mgr = registry.get_manager("transcription")
-        ```
-    """
-    
-    def __init__(self, config_dir: Optional[Path] = None):
-        """Initialize the unified plugin registry.
-        
-        Args:
-            config_dir: Directory for plugin configuration files (default: 'configs')
-        """
+    def __init__(self, 
+                 config_dir: Optional[Path] = None  # Directory for plugin configuration files (default: 'configs')
+                ):
+        """Initialize the unified plugin registry."""
         self._managers: Dict[str, Any] = {}  # category -> manager
         self._categories: Dict[str, str] = {}  # category -> display_name
         self._plugins: Dict[str, PluginMetadata] = {}  # unique_id -> metadata
@@ -69,17 +36,7 @@ class UnifiedPluginRegistry:
         display_name: Optional[str] = None,  # Display name for UI
         auto_discover: bool = True  # Automatically discover plugins?
     ) -> List[PluginMetadata]:  # List of discovered plugin metadata
-        """Register a domain-specific plugin manager.
-        
-        Args:
-            category: String category (e.g., 'transcription')
-            manager: The domain-specific plugin manager instance
-            display_name: Optional display name for UI
-            auto_discover: Automatically discover and register plugins
-        
-        Returns:
-            List of discovered plugin metadata
-        """
+        """Register a domain-specific plugin manager."""
         self._managers[category] = manager
         self._categories[category] = display_name or category.title()
         
@@ -89,9 +46,9 @@ class UnifiedPluginRegistry:
     
     def _discover_and_register_plugins(
         self,
-        category: str,
-        manager: Any
-    ) -> List[PluginMetadata]:
+        category: str,  # Category name
+        manager: Any  # Plugin manager instance
+    ) -> List[PluginMetadata]:  # List of discovered plugin metadata
         """Discover plugins from manager and register their metadata."""
         discovered = manager.discover_plugins()
         plugin_metadatas = []
@@ -123,102 +80,57 @@ class UnifiedPluginRegistry:
     def get_manager(
         self,
         category: str,  # Category name
-        manager_type: Optional[Type[T]] = None  # Optional type hint
+        manager_type: Optional[Type[T]] = None  # Optional type hint for IDE autocomplete
     ) -> Optional[T]:  # Plugin manager instance
-        """Get plugin manager for a specific category.
-        
-        Args:
-            category: Category name (e.g., 'transcription')
-            manager_type: Optional type hint for IDE autocomplete
-        
-        Returns:
-            Plugin manager instance if found, None otherwise
-        """
+        """Get plugin manager for a specific category."""
         return self._managers.get(category)
     
-    def get_categories(self) -> List[str]:
-        """Get all registered categories.
-        
-        Returns:
-            Sorted list of category names
-        """
+    def get_categories(self) -> List[str]:  # Sorted list of category names
+        """Get all registered categories."""
         return sorted(self._categories.keys())
     
-    def get_category_display_name(self, category: str) -> str:
-        """Get display name for a category.
-        
-        Args:
-            category: Category name
-        
-        Returns:
-            Display name or category name if not set
-        """
+    def get_category_display_name(self, 
+                                   category: str  # Category name
+                                  ) -> str:  # Display name or category name if not set
+        """Get display name for a category."""
         return self._categories.get(category, category.title())
     
-    def get_plugin(self, unique_id: str) -> Optional[PluginMetadata]:
-        """Get plugin metadata by unique ID.
-        
-        Args:
-            unique_id: Plugin unique identifier (format: 'category_name')
-        
-        Returns:
-            Plugin metadata if found, None otherwise
-        """
+    def get_plugin(self, 
+                   unique_id: str  # Plugin unique identifier (format: 'category_name')
+                  ) -> Optional[PluginMetadata]:  # Plugin metadata if found, None otherwise
+        """Get plugin metadata by unique ID."""
         return self._plugins.get(unique_id)
     
-    def get_plugins_by_category(self, category: str) -> List[PluginMetadata]:
-        """Get all plugins in a category.
-        
-        Args:
-            category: Category name
-        
-        Returns:
-            List of plugin metadata for the category
-        """
+    def get_plugins_by_category(self, 
+                                category: str  # Category name
+                               ) -> List[PluginMetadata]:  # List of plugin metadata for the category
+        """Get all plugins in a category."""
         return [p for p in self._plugins.values() if p.category == category]
     
-    def get_all_plugins(self) -> List[PluginMetadata]:
-        """Get all plugins across all categories.
-        
-        Returns:
-            List of all plugin metadata
-        """
+    def get_all_plugins(self) -> List[PluginMetadata]:  # List of all plugin metadata
+        """Get all plugins across all categories."""
         return list(self._plugins.values())
     
-    def get_categories_with_plugins(self) -> List[str]:
-        """Get categories that have registered plugins.
-        
-        Returns:
-            Sorted list of categories with plugins
-        """
+    def get_categories_with_plugins(self) -> List[str]:  # Sorted list of categories with plugins
+        """Get categories that have registered plugins."""
         categories = set(p.category for p in self._plugins.values())
         return sorted(categories)
     
-    def load_plugin_config(self, unique_id: str) -> Dict[str, Any]:
-        """Load saved configuration for a plugin.
-        
-        Args:
-            unique_id: Plugin unique identifier
-        
-        Returns:
-            Configuration dictionary (empty if no config exists)
-        """
+    def load_plugin_config(self, 
+                          unique_id: str  # Plugin unique identifier
+                         ) -> Dict[str, Any]:  # Configuration dictionary (empty if no config exists)
+        """Load saved configuration for a plugin."""
         config_file = self._config_dir / f"{unique_id}.json"
         if config_file.exists():
             with open(config_file, 'r') as f:
                 return json.load(f)
         return {}
     
-    def save_plugin_config(self, unique_id: str, config: Dict[str, Any]) -> bool:
-        """Save configuration for a plugin.
-        
-        Args:
-            unique_id: Plugin unique identifier
-            config: Configuration dictionary to save
-        
-        Returns:
-            True if save succeeded, False otherwise
-        """
+    def save_plugin_config(self, 
+                          unique_id: str,  # Plugin unique identifier
+                          config: Dict[str, Any]  # Configuration dictionary to save
+                         ) -> bool:  # True if save succeeded, False otherwise
+        """Save configuration for a plugin."""
         try:
             config_file = self._config_dir / f"{unique_id}.json"
             with open(config_file, 'w') as f:
@@ -233,15 +145,10 @@ class UnifiedPluginRegistry:
             print(f"Error saving config for {unique_id}: {e}")
             return False
     
-    def delete_plugin_config(self, unique_id: str) -> bool:
-        """Delete saved configuration for a plugin.
-        
-        Args:
-            unique_id: Plugin unique identifier
-        
-        Returns:
-            True if deletion succeeded, False otherwise
-        """
+    def delete_plugin_config(self, 
+                            unique_id: str  # Plugin unique identifier
+                           ) -> bool:  # True if deletion succeeded, False otherwise
+        """Delete saved configuration for a plugin."""
         try:
             config_file = self._config_dir / f"{unique_id}.json"
             if config_file.exists():

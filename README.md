@@ -38,8 +38,8 @@ graph LR
     core_metadata --> core_execution_mode
     core_registry --> core_metadata
     core_registry --> core_execution_mode
-    protocols_cloud_aware --> core_metadata
     protocols_cloud_aware --> core_execution_mode
+    protocols_cloud_aware --> core_metadata
     protocols_lifecycle --> core_execution_mode
     utils_helpers --> core_metadata
     utils_helpers --> core_execution_mode
@@ -73,186 +73,66 @@ from cjm_fasthtml_plugins.protocols.cloud_aware import (
 #### Functions
 
 ``` python
-def is_cloud_aware(plugin: Any) -> bool:
-    """Check if a plugin implements the CloudAwarePlugin protocol.
-    
-    Args:
-        plugin: Plugin instance to check
-    
-    Returns:
-        True if plugin implements the protocol
-    """
-    return isinstance(plugin, CloudAwarePlugin)
-
-def has_active_cloud_resources(plugin: Any) -> bool
-    """
-    Check if a plugin implements the CloudAwarePlugin protocol.
-    
-    Args:
-        plugin: Plugin instance to check
-    
-    Returns:
-        True if plugin implements the protocol
-    """
+def is_cloud_aware(plugin: Any  # Plugin instance to check
+                  ) -> bool:  # True if plugin implements the protocol
+    "Check if a plugin implements the CloudAwarePlugin protocol."
 ```
 
 ``` python
-def has_active_cloud_resources(plugin: Any) -> bool:
-    """Check if plugin has active cloud resources.
-    
-    Args:
-        plugin: Plugin instance
-    
-    Returns:
-        True if plugin has running cloud resources
-    """
-    if not is_cloud_aware(plugin)
-    """
-    Check if plugin has active cloud resources.
-    
-    Args:
-        plugin: Plugin instance
-    
-    Returns:
-        True if plugin has running cloud resources
-    """
+def has_active_cloud_resources(plugin: Any  # Plugin instance
+                               ) -> bool:  # True if plugin has running cloud resources
+    "Check if plugin has active cloud resources."
 ```
 
 ``` python
-def get_total_estimated_cost(plugins: List[Any], duration_hours: float = 1.0) -> float:
-    """Get total estimated cost for multiple plugins.
-    
-    Args:
-        plugins: List of plugin instances
-        duration_hours: Duration to estimate for
-    
-    Returns:
-        Total estimated cost in USD
-    """
-    total = 0.0
-    for plugin in plugins
-    """
-    Get total estimated cost for multiple plugins.
-    
-    Args:
-        plugins: List of plugin instances
-        duration_hours: Duration to estimate for
-    
-    Returns:
-        Total estimated cost in USD
-    """
+def get_total_estimated_cost(plugins: List[Any],  # List of plugin instances
+                            duration_hours: float = 1.0  # Duration to estimate for
+                           ) -> float:  # Total estimated cost in USD
+    "Get total estimated cost for multiple plugins."
 ```
 
 #### Classes
 
-```` python
+``` python
 @runtime_checkable
 class CloudAwarePlugin(Protocol):
-    """
-    Protocol for plugins that use cloud/remote resources.
+    "Protocol for plugins that use cloud/remote resources."
     
-    Plugins implementing this protocol provide information about
-    cloud resources they use, enabling cost tracking, resource
-    management, and emergency shutdown.
-    
-    Example:
-        ```python
-        class CloudFinetunePlugin(FinetuningPlugin, CloudAwarePlugin):
-            def get_remote_resource_info(self) -> Optional[RemoteResourceInfo]:
-                if not self.remote_instance:
-                    return None
-                return RemoteResourceInfo(
-                    provider=CloudProviderType.AWS,
-                    instance_id=self.instance_id,
-                    status="running",
-                    gpu_count=8,
-                    estimated_cost_per_hour=24.50
-                )
-            
-            def provision_remote_resource(self, **config) -> RemoteResourceInfo:
-                # Launch EC2 instance
-                return self.remote_resource_info
-            
-            def terminate_remote_resource(self) -> bool:
-                # Terminate EC2 instance
-                return True
-            
-            def estimate_cost(self, duration_hours: float) -> float:
-                return duration_hours * 24.50
-        ```
-    """
-    
-    def get_remote_resource_info(self) -> Optional[RemoteResourceInfo]:
-            """Get information about remote/cloud resources.
-            
-            Returns:
-                RemoteResourceInfo if resources are provisioned, None otherwise
-            """
+    def get_remote_resource_info(self) -> Optional[RemoteResourceInfo]:  # RemoteResourceInfo if resources are provisioned, None otherwise
+            """Get information about remote/cloud resources."""
             ...
         
-        def provision_remote_resource(self, **config) -> RemoteResourceInfo
-        "Get information about remote/cloud resources.
-
-Returns:
-    RemoteResourceInfo if resources are provisioned, None otherwise"
+        def provision_remote_resource(self, **config) -> RemoteResourceInfo:  # RemoteResourceInfo with details about provisioned resource
+        "Get information about remote/cloud resources."
     
-    def provision_remote_resource(self, **config) -> RemoteResourceInfo:
-            """Provision cloud resources (VM, container, etc.).
-            
-            Args:
-                **config: Provider-specific configuration
-            
-            Returns:
-                RemoteResourceInfo with details about provisioned resource
-            """
+    def provision_remote_resource(self, **config) -> RemoteResourceInfo:  # RemoteResourceInfo with details about provisioned resource
+            """Provision cloud resources (VM, container, etc.)."""
             ...
         
-        def check_remote_resource_status(self) -> str
-        "Provision cloud resources (VM, container, etc.).
-
-Args:
-    **config: Provider-specific configuration
-
-Returns:
-    RemoteResourceInfo with details about provisioned resource"
+        def check_remote_resource_status(self) -> str:  # Status string (e.g., 'running', 'stopped', 'provisioning')
+        "Provision cloud resources (VM, container, etc.)."
     
-    def check_remote_resource_status(self) -> str:
-            """Check status of remote resource.
-            
-            Returns:
-                Status string (e.g., 'running', 'stopped', 'provisioning')
-            """
+    def check_remote_resource_status(self) -> str:  # Status string (e.g., 'running', 'stopped', 'provisioning')
+            """Check status of remote resource."""
             ...
         
-        def terminate_remote_resource(self) -> bool
-        "Check status of remote resource.
-
-Returns:
-    Status string (e.g., 'running', 'stopped', 'provisioning')"
+        def terminate_remote_resource(self) -> bool:  # True if termination succeeded
+        "Check status of remote resource."
     
-    def terminate_remote_resource(self) -> bool:
-            """Terminate/stop cloud resources to avoid costs.
-            
-            Returns:
-                True if termination succeeded
-            """
+    def terminate_remote_resource(self) -> bool:  # True if termination succeeded
+            """Terminate/stop cloud resources to avoid costs."""
             ...
         
-        def estimate_cost(self, duration_hours: float) -> float
-        "Terminate/stop cloud resources to avoid costs.
-
-Returns:
-    True if termination succeeded"
+        def estimate_cost(self, 
+                         duration_hours: float  # Estimated runtime in hours
+                        ) -> float:  # Estimated cost in USD
+        "Terminate/stop cloud resources to avoid costs."
     
-    def estimate_cost(self, duration_hours: float) -> float
-        "Estimate cost for running this duration.
-
-Args:
-    duration_hours: Estimated runtime in hours
-
-Returns:
-    Estimated cost in USD"
-````
+    def estimate_cost(self,
+                         duration_hours: float  # Estimated runtime in hours
+                        ) -> float:  # Estimated cost in USD
+        "Estimate cost for running this duration."
+```
 
 ### Execution Mode (`execution_mode.ipynb`)
 
@@ -272,41 +152,12 @@ from cjm_fasthtml_plugins.core.execution_mode import (
 
 ``` python
 class PluginExecutionMode(Enum):
-    """
-    How a plugin executes.
-    
-    This enum categorizes plugins by their execution environment,
-    from simple in-process execution to complex cloud deployments.
-    
-    Examples:
-        >>> # Simple in-process plugin
-        >>> mode = PluginExecutionMode.IN_PROCESS
-        >>> 
-        >>> # Plugin that spawns subprocesses (like vLLM server)
-        >>> mode = PluginExecutionMode.SUBPROCESS
-        >>> 
-        >>> # Plugin running on cloud GPU
-        >>> mode = PluginExecutionMode.CLOUD_GPU
-    """
+    "Categorizes plugins by their execution environment, from in-process to cloud deployments."
 ```
 
 ``` python
 class CloudProviderType(Enum):
-    """
-    Supported cloud providers.
-    
-    Identifies which cloud provider or GPU rental service is being used
-    for remote execution.
-    
-    Examples:
-        >>> # Major cloud providers
-        >>> provider = CloudProviderType.AWS
-        >>> provider = CloudProviderType.GCP
-        >>> 
-        >>> # GPU rental services
-        >>> provider = CloudProviderType.LAMBDA_LABS
-        >>> provider = CloudProviderType.RUNPOD
-    """
+    "Cloud providers and GPU rental services for remote execution."
 ```
 
 ### Helpers (`helpers.ipynb`)
@@ -333,124 +184,37 @@ def filter_plugins_by_execution_mode(
     plugins: List[PluginMetadata],  # List of plugin metadata
     mode: PluginExecutionMode  # Execution mode to filter by
 ) -> List[PluginMetadata]:  # Filtered list
-    """
-    Filter plugins by execution mode.
-    
-    Args:
-        plugins: List of plugin metadata
-        mode: Execution mode to filter by
-    
-    Returns:
-        List of plugins matching the execution mode
-    """
+    "Filter plugins by execution mode."
 ```
 
 ``` python
-def get_cloud_plugins(plugins: List[PluginMetadata]) -> List[PluginMetadata]:
-    """Get all cloud/remote execution plugins.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        List of cloud/remote plugins
-    """
-    return [p for p in plugins if p.is_cloud_execution()]
-
-def get_local_plugins(plugins: List[PluginMetadata]) -> List[PluginMetadata]
-    """
-    Get all cloud/remote execution plugins.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        List of cloud/remote plugins
-    """
+def get_cloud_plugins(plugins: List[PluginMetadata]  # List of plugin metadata
+                     ) -> List[PluginMetadata]:  # List of cloud/remote plugins
+    "Get all cloud/remote execution plugins."
 ```
 
 ``` python
-def get_local_plugins(plugins: List[PluginMetadata]) -> List[PluginMetadata]:
-    """Get all local execution plugins.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        List of local plugins
-    """
-    return [p for p in plugins if p.is_local_execution()]
-
-def get_configured_plugins(plugins: List[PluginMetadata]) -> List[PluginMetadata]
-    """
-    Get all local execution plugins.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        List of local plugins
-    """
+def get_local_plugins(plugins: List[PluginMetadata]  # List of plugin metadata
+                     ) -> List[PluginMetadata]:  # List of local plugins
+    "Get all local execution plugins."
 ```
 
 ``` python
-def get_configured_plugins(plugins: List[PluginMetadata]) -> List[PluginMetadata]:
-    """Get plugins that have saved configuration.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        List of configured plugins
-    """
-    return [p for p in plugins if p.is_configured]
-
-def get_unconfigured_plugins(plugins: List[PluginMetadata]) -> List[PluginMetadata]
-    """
-    Get plugins that have saved configuration.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        List of configured plugins
-    """
+def get_configured_plugins(plugins: List[PluginMetadata]  # List of plugin metadata
+                          ) -> List[PluginMetadata]:  # List of configured plugins
+    "Get plugins that have saved configuration."
 ```
 
 ``` python
-def get_unconfigured_plugins(plugins: List[PluginMetadata]) -> List[PluginMetadata]
-    """
-    Get plugins that need configuration.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        List of unconfigured plugins
-    """
+def get_unconfigured_plugins(plugins: List[PluginMetadata]  # List of plugin metadata
+                            ) -> List[PluginMetadata]:  # List of unconfigured plugins
+    "Get plugins that need configuration."
 ```
 
 ``` python
-def get_plugin_stats(plugins: List[PluginMetadata]) -> Dict[str, Any]:
-    """Get statistics about a list of plugins.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        Dictionary with plugin statistics
-    """
-    return {
-        "total": len(plugins),
-    """
-    Get statistics about a list of plugins.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        Dictionary with plugin statistics
-    """
+def get_plugin_stats(plugins: List[PluginMetadata]  # List of plugin metadata
+                    ) -> Dict[str, Any]:  # Dictionary with plugin statistics
+    "Get statistics about a list of plugins."
 ```
 
 ### Lifecycle Protocol (`lifecycle.ipynb`)
@@ -471,160 +235,48 @@ from cjm_fasthtml_plugins.protocols.lifecycle import (
 #### Functions
 
 ``` python
-def is_lifecycle_aware(plugin: Any) -> bool:
-    """Check if a plugin implements the LifecycleAwarePlugin protocol.
-    
-    Args:
-        plugin: Plugin instance to check
-    
-    Returns:
-        True if plugin implements the protocol
-    """
-    return isinstance(plugin, LifecycleAwarePlugin)
-
-def get_all_managed_pids(plugin: Any) -> List[int]
-    """
-    Check if a plugin implements the LifecycleAwarePlugin protocol.
-    
-    Args:
-        plugin: Plugin instance to check
-    
-    Returns:
-        True if plugin implements the protocol
-    """
+def is_lifecycle_aware(plugin: Any  # Plugin instance to check
+                      ) -> bool:  # True if plugin implements the protocol
+    "Check if a plugin implements the LifecycleAwarePlugin protocol."
 ```
 
 ``` python
-def get_all_managed_pids(plugin: Any) -> List[int]:
-    """Get all PIDs managed by a plugin (including children).
-    
-    Args:
-        plugin: Plugin instance
-    
-    Returns:
-        List of all PIDs (empty if plugin not lifecycle-aware)
-    """
-    if not is_lifecycle_aware(plugin)
-    """
-    Get all PIDs managed by a plugin (including children).
-    
-    Args:
-        plugin: Plugin instance
-    
-    Returns:
-        List of all PIDs (empty if plugin not lifecycle-aware)
-    """
+def get_all_managed_pids(plugin: Any  # Plugin instance
+                        ) -> List[int]:  # List of all PIDs (empty if plugin not lifecycle-aware)
+    "Get all PIDs managed by a plugin (including children)."
 ```
 
 #### Classes
 
-```` python
+``` python
 @runtime_checkable
 class LifecycleAwarePlugin(Protocol):
-    """
-    Protocol for plugins that manage external resources.
+    "Protocol for plugins that manage external resources like child processes, containers, or cloud resources."
     
-    Plugins implementing this protocol provide information about
-    child processes, containers, or other resources they manage.
-    
-    This enables:
-    - Resource tracking across the application
-    - Proper cleanup when stopping plugins
-    - Conflict detection for GPU/memory usage
-    - Cost tracking for cloud resources
-    
-    Example:
-        ```python
-        class VoxtralVLLMPlugin(TranscriptionPlugin, LifecycleAwarePlugin):
-            def get_execution_mode(self) -> PluginExecutionMode:
-                return PluginExecutionMode.SUBPROCESS
-            
-            def get_child_pids(self) -> List[int]:
-                if not self.server or not self.server.process:
-                    return []
-                return [self.server.process.pid]
-            
-            def get_managed_resources(self) -> Dict[str, Any]:
-                return {
-                    'server_url': self.server.base_url,
-                    'is_running': self.server.is_running()
-                }
-            
-            def force_cleanup(self) -> None:
-                if self.server:
-                    self.server.stop()
-        ```
-    """
-    
-    def get_execution_mode(self) -> PluginExecutionMode:
-            """Get the execution mode of this plugin.
-            
-            Returns:
-                PluginExecutionMode indicating how this plugin executes
-            """
+    def get_execution_mode(self) -> PluginExecutionMode:  # PluginExecutionMode indicating how this plugin executes
+            """Get the execution mode of this plugin."""
             ...
         
-        def get_child_pids(self) -> List[int]
-        "Get the execution mode of this plugin.
-
-Returns:
-    PluginExecutionMode indicating how this plugin executes"
+        def get_child_pids(self) -> List[int]:  # List of process IDs (empty list if no child processes)
+        "Get the execution mode of this plugin."
     
-    def get_child_pids(self) -> List[int]:
-            """Get PIDs of any child processes managed by this plugin.
-            
-            For plugins that spawn subprocesses (e.g., vLLM servers), this
-            should return all child process PIDs for resource tracking.
-            
-            Returns:
-                List of process IDs (empty list if no child processes)
-            """
+    def get_child_pids(self) -> List[int]:  # List of process IDs (empty list if no child processes)
+            """Get PIDs of any child processes managed by this plugin."""
             ...
         
-        def get_managed_resources(self) -> Dict[str, Any]
-        "Get PIDs of any child processes managed by this plugin.
-
-For plugins that spawn subprocesses (e.g., vLLM servers), this
-should return all child process PIDs for resource tracking.
-
-Returns:
-    List of process IDs (empty list if no child processes)"
+        def get_managed_resources(self) -> Dict[str, Any]:  # Dictionary with resource information
+        "Get PIDs of any child processes managed by this plugin."
     
-    def get_managed_resources(self) -> Dict[str, Any]:
-            """Get information about managed resources.
-            
-            This can include:
-            - Server URLs and ports
-            - Container IDs
-            - Conda environment names
-            - Status information
-            - Any other plugin-specific resource info
-            
-            Returns:
-                Dictionary with resource information
-            """
+    def get_managed_resources(self) -> Dict[str, Any]:  # Dictionary with resource information
+            """Get information about managed resources (server URLs, container IDs, conda envs, etc.)."""
             ...
         
         def force_cleanup(self) -> None
-        "Get information about managed resources.
-
-This can include:
-- Server URLs and ports
-- Container IDs
-- Conda environment names
-- Status information
-- Any other plugin-specific resource info
-
-Returns:
-    Dictionary with resource information"
+        "Get information about managed resources (server URLs, container IDs, conda envs, etc.)."
     
     def force_cleanup(self) -> None
-        "Force cleanup of all managed resources.
-
-This should be more aggressive than regular cleanup(),
-killing processes, stopping containers, etc. Used for
-emergency shutdown scenarios."
-````
+        "Force cleanup of all managed resources (kill processes, stop containers, etc.)."
+```
 
 ### Metadata (`metadata.ipynb`)
 
@@ -645,148 +297,52 @@ from cjm_fasthtml_plugins.core.metadata import (
 ``` python
 @dataclass
 class RemoteResourceInfo:
-    """
-    Information about a remote/cloud resource.
+    "Information about a remote/cloud resource used by a plugin."
     
-    Tracks details about cloud VMs, containers, or other remote resources
-    that a plugin is using for execution.
-    
-    Attributes:
-        provider: Cloud provider or service
-        region: Cloud region/zone
-        instance_id: VM/instance identifier
-        job_id: Job/task identifier on remote system
-        endpoint_url: HTTP endpoint for API access
-        ssh_host: SSH host for remote access
-        ssh_port: SSH port number
-        status: Current status (provisioning, running, stopping, stopped)
-        resource_type: Instance type (e.g., 'p3.2xlarge', 'n1-standard-8')
-        gpu_count: Number of GPUs
-        gpu_type: GPU model (e.g., 'V100', 'A100', 'H100')
-        estimated_cost_per_hour: Estimated hourly cost in USD
-        metadata: Additional provider-specific metadata
-    """
-    
-    provider: CloudProviderType
-    region: Optional[str]
-    instance_id: Optional[str]
-    job_id: Optional[str]
-    endpoint_url: Optional[str]
-    ssh_host: Optional[str]
-    ssh_port: int = 22
-    status: str = 'unknown'  # provisioning, running, stopping, stopped
-    resource_type: Optional[str]
-    gpu_count: int = 0
-    gpu_type: Optional[str]
-    estimated_cost_per_hour: Optional[float]
-    metadata: Dict[str, Any] = field(...)
+    provider: CloudProviderType  # Cloud provider or service
+    region: Optional[str]  # Cloud region/zone
+    instance_id: Optional[str]  # VM/instance identifier
+    job_id: Optional[str]  # Job/task identifier on remote system
+    endpoint_url: Optional[str]  # HTTP endpoint for API access
+    ssh_host: Optional[str]  # SSH host for remote access
+    ssh_port: int = 22  # SSH port number
+    status: str = 'unknown'  # Current status (provisioning, running, stopping, stopped)
+    resource_type: Optional[str]  # Instance type (e.g., 'p3.2xlarge', 'n1-standard-8')
+    gpu_count: int = 0  # Number of GPUs
+    gpu_type: Optional[str]  # GPU model (e.g., 'V100', 'A100', 'H100')
+    estimated_cost_per_hour: Optional[float]  # Estimated hourly cost in USD
+    metadata: Dict[str, Any] = field(...)  # Additional provider-specific metadata
 ```
 
-```` python
+``` python
 @dataclass
 class PluginMetadata:
-    """
-    Metadata describing a plugin.
+    "Metadata describing a plugin for display and resource management without loading the plugin instance."
     
-    This dataclass holds information about a plugin that can be displayed
-    in settings UI and used for resource management without loading the
-    actual plugin instance.
+    name: str  # Internal plugin identifier
+    category: str  # Plugin category string (application-defined)
+    title: str  # Display title for the plugin
+    config_schema: Dict[str, Any]  # JSON Schema for plugin configuration
+    description: Optional[str]  # Plugin description
+    version: Optional[str]  # Plugin version
+    is_configured: bool = False  # Whether the plugin has saved configuration
+    execution_mode: PluginExecutionMode = PluginExecutionMode.IN_PROCESS  # How the plugin executes
+    manages_child_processes: bool = False  # Whether plugin spawns child processes
+    manages_external_resources: bool = False  # Whether plugin manages Docker/servers/etc.
+    spawned_pids: List[int] = field(...)  # List of child process PIDs
+    container_id: Optional[str]  # Docker container ID if applicable
+    conda_env_name: Optional[str]  # Conda environment name if applicable
+    remote_resource: Optional[RemoteResourceInfo]  # Remote resource information if applicable
     
-    Categories are simple strings - applications choose their own category names
-    based on their needs (e.g., 'transcription', 'llm', 'image_generation', etc.).
-    
-    Attributes:
-        name: Internal plugin identifier
-        category: Plugin category string (application-defined)
-        title: Display title for the plugin
-        config_schema: JSON Schema for plugin configuration
-        description: Optional plugin description
-        version: Optional plugin version
-        is_configured: Whether the plugin has saved configuration
-        
-        # Lifecycle metadata
-        execution_mode: How the plugin executes (in-process, subprocess, cloud, etc.)
-        manages_child_processes: Whether plugin spawns child processes
-        manages_external_resources: Whether plugin manages Docker/servers/etc.
-        
-        # Local resource tracking
-        spawned_pids: List of child process PIDs
-        container_id: Docker container ID if applicable
-        conda_env_name: Conda environment name if applicable
-        
-        # Cloud/Remote resource tracking
-        remote_resource: Remote resource information if applicable
-    
-    Example:
-        ```python
-        # Simple in-process plugin
-        metadata = PluginMetadata(
-            name="whisper_base",
-            category="transcription",
-            title="Whisper Base Model",
-            config_schema={...},
-            execution_mode=PluginExecutionMode.IN_PROCESS
-        )
-        
-        # Plugin with vLLM server (subprocess)
-        metadata = PluginMetadata(
-            name="voxtral_vllm",
-            category="transcription",
-            title="Voxtral via vLLM",
-            config_schema={...},
-            execution_mode=PluginExecutionMode.SUBPROCESS,
-            manages_child_processes=True,
-            spawned_pids=[12345, 12346, 12347]
-        )
-        
-        # Cloud-based plugin
-        metadata = PluginMetadata(
-            name="llm_finetune_cloud",
-            category="finetuning",
-            title="Cloud LLM Finetuning",
-            config_schema={...},
-            execution_mode=PluginExecutionMode.CLOUD_GPU,
-            manages_external_resources=True,
-            remote_resource=RemoteResourceInfo(...)
-        )
-        ```
-    """
-    
-    name: str
-    category: str
-    title: str
-    config_schema: Dict[str, Any]
-    description: Optional[str]
-    version: Optional[str]
-    is_configured: bool = False
-    execution_mode: PluginExecutionMode = PluginExecutionMode.IN_PROCESS
-    manages_child_processes: bool = False
-    manages_external_resources: bool = False
-    spawned_pids: List[int] = field(...)
-    container_id: Optional[str]
-    conda_env_name: Optional[str]
-    remote_resource: Optional[RemoteResourceInfo]
-    
-    def get_unique_id(self) -> str:
-            """Generate unique ID for this plugin.
-            
-            Returns:
-                String in format 'category_name'
-            """
+    def get_unique_id(self) -> str:  # String in format 'category_name'
+            """Generate unique ID for this plugin."""
             return f"{self.category}_{self.name}"
         
-        def is_local_execution(self) -> bool
-        "Generate unique ID for this plugin.
-
-Returns:
-    String in format 'category_name'"
+        def is_local_execution(self) -> bool:  # True if execution is local
+        "Generate unique ID for this plugin."
     
-    def is_local_execution(self) -> bool:
-            """Check if plugin executes locally (not cloud/remote).
-            
-            Returns:
-                True if execution is local
-            """
+    def is_local_execution(self) -> bool:  # True if execution is local
+            """Check if plugin executes locally (not cloud/remote)."""
             local_modes = {
                 PluginExecutionMode.IN_PROCESS,
                 PluginExecutionMode.SUBPROCESS,
@@ -796,32 +352,19 @@ Returns:
             }
             return self.execution_mode in local_modes
         
-        def is_cloud_execution(self) -> bool
-        "Check if plugin executes locally (not cloud/remote).
-
-Returns:
-    True if execution is local"
+        def is_cloud_execution(self) -> bool:  # True if execution is cloud/remote
+        "Check if plugin executes locally (not cloud/remote)."
     
-    def is_cloud_execution(self) -> bool:
-            """Check if plugin executes on cloud/remote resources.
-            
-            Returns:
-                True if execution is cloud/remote
-            """
+    def is_cloud_execution(self) -> bool:  # True if execution is cloud/remote
+            """Check if plugin executes on cloud/remote resources."""
             return not self.is_local_execution()
         
-        def has_active_resources(self) -> bool
-        "Check if plugin executes on cloud/remote resources.
-
-Returns:
-    True if execution is cloud/remote"
+        def has_active_resources(self) -> bool:  # True if plugin has child processes, containers, or cloud resources
+        "Check if plugin executes on cloud/remote resources."
     
-    def has_active_resources(self) -> bool
-        "Check if plugin has active managed resources.
-
-Returns:
-    True if plugin has child processes, containers, or cloud resources"
-````
+    def has_active_resources(self) -> bool:  # True if plugin has child processes, containers, or cloud resources
+        "Check if plugin has active managed resources."
+```
 
 ### Registry (`registry.ipynb`)
 
@@ -839,60 +382,17 @@ from cjm_fasthtml_plugins.core.registry import (
 
 #### Classes
 
-```` python
+``` python
 class UnifiedPluginRegistry:
-    def __init__(self, config_dir: Optional[Path] = None):
-        """Initialize the unified plugin registry.
-        
-        Args:
-            config_dir: Directory for plugin configuration files (default: 'configs')
-        """
-        self._managers: Dict[str, Any] = {}  # category -> manager
-    """
-    Unified registry for multiple domain-specific plugin systems.
+    def __init__(self, 
+                 config_dir: Optional[Path] = None  # Directory for plugin configuration files (default: 'configs')
+                )
+    "Unified registry for multiple domain-specific plugin systems with configuration persistence."
     
-    Manages plugin managers from different domains (transcription, LLM, etc.)
-    and provides a single interface for plugin discovery, configuration,
-    and resource management.
-    
-    Example:
-        ```python
-        from cjm_plugin_system.core.manager import PluginManager
-        from cjm_transcription_plugin_system.plugin_interface import TranscriptionPlugin
-        
-        # Create registry
-        registry = UnifiedPluginRegistry()
-        
-        # Register transcription plugins
-        transcription_mgr = PluginManager(plugin_interface=TranscriptionPlugin)
-        registry.register_plugin_manager(
-            category="transcription",
-            manager=transcription_mgr,
-            display_name="Transcription"
-        )
-        
-        # Get all plugins
-        all_plugins = registry.get_all_plugins()
-        
-        # Get plugins by category
-        transcription_plugins = registry.get_plugins_by_category("transcription")
-        
-        # Get manager for specific operations
-        mgr = registry.get_manager("transcription")
-        ```
-    """
-    
-    def __init__(self, config_dir: Optional[Path] = None):
-            """Initialize the unified plugin registry.
-            
-            Args:
-                config_dir: Directory for plugin configuration files (default: 'configs')
-            """
-            self._managers: Dict[str, Any] = {}  # category -> manager
-        "Initialize the unified plugin registry.
-
-Args:
-    config_dir: Directory for plugin configuration files (default: 'configs')"
+    def __init__(self,
+                     config_dir: Optional[Path] = None  # Directory for plugin configuration files (default: 'configs')
+                    )
+        "Initialize the unified plugin registry."
     
     def register_plugin_manager(
             self,
@@ -901,191 +401,72 @@ Args:
             display_name: Optional[str] = None,  # Display name for UI
             auto_discover: bool = True  # Automatically discover plugins?
         ) -> List[PluginMetadata]:  # List of discovered plugin metadata
-        "Register a domain-specific plugin manager.
-
-Args:
-    category: String category (e.g., 'transcription')
-    manager: The domain-specific plugin manager instance
-    display_name: Optional display name for UI
-    auto_discover: Automatically discover and register plugins
-
-Returns:
-    List of discovered plugin metadata"
+        "Register a domain-specific plugin manager."
     
     def get_manager(
             self,
             category: str,  # Category name
-            manager_type: Optional[Type[T]] = None  # Optional type hint
+            manager_type: Optional[Type[T]] = None  # Optional type hint for IDE autocomplete
         ) -> Optional[T]:  # Plugin manager instance
-        "Get plugin manager for a specific category.
-
-Args:
-    category: Category name (e.g., 'transcription')
-    manager_type: Optional type hint for IDE autocomplete
-
-Returns:
-    Plugin manager instance if found, None otherwise"
+        "Get plugin manager for a specific category."
     
-    def get_categories(self) -> List[str]:
-            """Get all registered categories.
-            
-            Returns:
-                Sorted list of category names
-            """
+    def get_categories(self) -> List[str]:  # Sorted list of category names
+            """Get all registered categories."""
             return sorted(self._categories.keys())
         
-        def get_category_display_name(self, category: str) -> str
-        "Get all registered categories.
-
-Returns:
-    Sorted list of category names"
+        def get_category_display_name(self, 
+                                       category: str  # Category name
+                                      ) -> str:  # Display name or category name if not set
+        "Get all registered categories."
     
-    def get_category_display_name(self, category: str) -> str:
-            """Get display name for a category.
-            
-            Args:
-                category: Category name
-            
-            Returns:
-                Display name or category name if not set
-            """
-            return self._categories.get(category, category.title())
-        
-        def get_plugin(self, unique_id: str) -> Optional[PluginMetadata]
-        "Get display name for a category.
-
-Args:
-    category: Category name
-
-Returns:
-    Display name or category name if not set"
+    def get_category_display_name(self,
+                                       category: str  # Category name
+                                      ) -> str:  # Display name or category name if not set
+        "Get display name for a category."
     
-    def get_plugin(self, unique_id: str) -> Optional[PluginMetadata]:
-            """Get plugin metadata by unique ID.
-            
-            Args:
-                unique_id: Plugin unique identifier (format: 'category_name')
-            
-            Returns:
-                Plugin metadata if found, None otherwise
-            """
-            return self._plugins.get(unique_id)
-        
-        def get_plugins_by_category(self, category: str) -> List[PluginMetadata]
-        "Get plugin metadata by unique ID.
-
-Args:
-    unique_id: Plugin unique identifier (format: 'category_name')
-
-Returns:
-    Plugin metadata if found, None otherwise"
+    def get_plugin(self,
+                       unique_id: str  # Plugin unique identifier (format: 'category_name')
+                      ) -> Optional[PluginMetadata]:  # Plugin metadata if found, None otherwise
+        "Get plugin metadata by unique ID."
     
-    def get_plugins_by_category(self, category: str) -> List[PluginMetadata]:
-            """Get all plugins in a category.
-            
-            Args:
-                category: Category name
-            
-            Returns:
-                List of plugin metadata for the category
-            """
-            return [p for p in self._plugins.values() if p.category == category]
-        
-        def get_all_plugins(self) -> List[PluginMetadata]
-        "Get all plugins in a category.
-
-Args:
-    category: Category name
-
-Returns:
-    List of plugin metadata for the category"
+    def get_plugins_by_category(self,
+                                    category: str  # Category name
+                                   ) -> List[PluginMetadata]:  # List of plugin metadata for the category
+        "Get all plugins in a category."
     
-    def get_all_plugins(self) -> List[PluginMetadata]:
-            """Get all plugins across all categories.
-            
-            Returns:
-                List of all plugin metadata
-            """
+    def get_all_plugins(self) -> List[PluginMetadata]:  # List of all plugin metadata
+            """Get all plugins across all categories."""
             return list(self._plugins.values())
         
-        def get_categories_with_plugins(self) -> List[str]
-        "Get all plugins across all categories.
-
-Returns:
-    List of all plugin metadata"
+        def get_categories_with_plugins(self) -> List[str]:  # Sorted list of categories with plugins
+        "Get all plugins across all categories."
     
-    def get_categories_with_plugins(self) -> List[str]:
-            """Get categories that have registered plugins.
-            
-            Returns:
-                Sorted list of categories with plugins
-            """
+    def get_categories_with_plugins(self) -> List[str]:  # Sorted list of categories with plugins
+            """Get categories that have registered plugins."""
             categories = set(p.category for p in self._plugins.values())
             return sorted(categories)
         
-        def load_plugin_config(self, unique_id: str) -> Dict[str, Any]
-        "Get categories that have registered plugins.
-
-Returns:
-    Sorted list of categories with plugins"
+        def load_plugin_config(self, 
+                              unique_id: str  # Plugin unique identifier
+                             ) -> Dict[str, Any]:  # Configuration dictionary (empty if no config exists)
+        "Get categories that have registered plugins."
     
-    def load_plugin_config(self, unique_id: str) -> Dict[str, Any]:
-            """Load saved configuration for a plugin.
-            
-            Args:
-                unique_id: Plugin unique identifier
-            
-            Returns:
-                Configuration dictionary (empty if no config exists)
-            """
-            config_file = self._config_dir / f"{unique_id}.json"
-            if config_file.exists()
-        "Load saved configuration for a plugin.
-
-Args:
-    unique_id: Plugin unique identifier
-
-Returns:
-    Configuration dictionary (empty if no config exists)"
+    def load_plugin_config(self,
+                              unique_id: str  # Plugin unique identifier
+                             ) -> Dict[str, Any]:  # Configuration dictionary (empty if no config exists)
+        "Load saved configuration for a plugin."
     
-    def save_plugin_config(self, unique_id: str, config: Dict[str, Any]) -> bool:
-            """Save configuration for a plugin.
-            
-            Args:
-                unique_id: Plugin unique identifier
-                config: Configuration dictionary to save
-            
-            Returns:
-                True if save succeeded, False otherwise
-            """
-            try
-        "Save configuration for a plugin.
-
-Args:
-    unique_id: Plugin unique identifier
-    config: Configuration dictionary to save
-
-Returns:
-    True if save succeeded, False otherwise"
+    def save_plugin_config(self,
+                              unique_id: str,  # Plugin unique identifier
+                              config: Dict[str, Any]  # Configuration dictionary to save
+                             ) -> bool:  # True if save succeeded, False otherwise
+        "Save configuration for a plugin."
     
-    def delete_plugin_config(self, unique_id: str) -> bool:
-            """Delete saved configuration for a plugin.
-            
-            Args:
-                unique_id: Plugin unique identifier
-            
-            Returns:
-                True if deletion succeeded, False otherwise
-            """
-            try
-        "Delete saved configuration for a plugin.
-
-Args:
-    unique_id: Plugin unique identifier
-
-Returns:
-    True if deletion succeeded, False otherwise"
-````
+    def delete_plugin_config(self,
+                                unique_id: str  # Plugin unique identifier
+                               ) -> bool:  # True if deletion succeeded, False otherwise
+        "Delete saved configuration for a plugin."
+```
 
 #### Variables
 

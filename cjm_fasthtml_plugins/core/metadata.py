@@ -14,143 +14,52 @@ from .execution_mode import PluginExecutionMode, CloudProviderType
 # %% ../../nbs/core/metadata.ipynb 5
 @dataclass
 class RemoteResourceInfo:
-    """Information about a remote/cloud resource.
-    
-    Tracks details about cloud VMs, containers, or other remote resources
-    that a plugin is using for execution.
-    
-    Attributes:
-        provider: Cloud provider or service
-        region: Cloud region/zone
-        instance_id: VM/instance identifier
-        job_id: Job/task identifier on remote system
-        endpoint_url: HTTP endpoint for API access
-        ssh_host: SSH host for remote access
-        ssh_port: SSH port number
-        status: Current status (provisioning, running, stopping, stopped)
-        resource_type: Instance type (e.g., 'p3.2xlarge', 'n1-standard-8')
-        gpu_count: Number of GPUs
-        gpu_type: GPU model (e.g., 'V100', 'A100', 'H100')
-        estimated_cost_per_hour: Estimated hourly cost in USD
-        metadata: Additional provider-specific metadata
-    """
-    provider: CloudProviderType
-    region: Optional[str] = None
-    instance_id: Optional[str] = None
-    job_id: Optional[str] = None
-    endpoint_url: Optional[str] = None
-    ssh_host: Optional[str] = None
-    ssh_port: int = 22
-    status: str = "unknown"  # provisioning, running, stopping, stopped
-    resource_type: Optional[str] = None
-    gpu_count: int = 0
-    gpu_type: Optional[str] = None
-    estimated_cost_per_hour: Optional[float] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    """Information about a remote/cloud resource used by a plugin."""
+    provider: CloudProviderType  # Cloud provider or service
+    region: Optional[str] = None  # Cloud region/zone
+    instance_id: Optional[str] = None  # VM/instance identifier
+    job_id: Optional[str] = None  # Job/task identifier on remote system
+    endpoint_url: Optional[str] = None  # HTTP endpoint for API access
+    ssh_host: Optional[str] = None  # SSH host for remote access
+    ssh_port: int = 22  # SSH port number
+    status: str = "unknown"  # Current status (provisioning, running, stopping, stopped)
+    resource_type: Optional[str] = None  # Instance type (e.g., 'p3.2xlarge', 'n1-standard-8')
+    gpu_count: int = 0  # Number of GPUs
+    gpu_type: Optional[str] = None  # GPU model (e.g., 'V100', 'A100', 'H100')
+    estimated_cost_per_hour: Optional[float] = None  # Estimated hourly cost in USD
+    metadata: Dict[str, Any] = field(default_factory=dict)  # Additional provider-specific metadata
 
 # %% ../../nbs/core/metadata.ipynb 9
 @dataclass
 class PluginMetadata:
-    """Metadata describing a plugin.
-    
-    This dataclass holds information about a plugin that can be displayed
-    in settings UI and used for resource management without loading the
-    actual plugin instance.
-    
-    Categories are simple strings - applications choose their own category names
-    based on their needs (e.g., 'transcription', 'llm', 'image_generation', etc.).
-    
-    Attributes:
-        name: Internal plugin identifier
-        category: Plugin category string (application-defined)
-        title: Display title for the plugin
-        config_schema: JSON Schema for plugin configuration
-        description: Optional plugin description
-        version: Optional plugin version
-        is_configured: Whether the plugin has saved configuration
-        
-        # Lifecycle metadata
-        execution_mode: How the plugin executes (in-process, subprocess, cloud, etc.)
-        manages_child_processes: Whether plugin spawns child processes
-        manages_external_resources: Whether plugin manages Docker/servers/etc.
-        
-        # Local resource tracking
-        spawned_pids: List of child process PIDs
-        container_id: Docker container ID if applicable
-        conda_env_name: Conda environment name if applicable
-        
-        # Cloud/Remote resource tracking
-        remote_resource: Remote resource information if applicable
-    
-    Example:
-        ```python
-        # Simple in-process plugin
-        metadata = PluginMetadata(
-            name="whisper_base",
-            category="transcription",
-            title="Whisper Base Model",
-            config_schema={...},
-            execution_mode=PluginExecutionMode.IN_PROCESS
-        )
-        
-        # Plugin with vLLM server (subprocess)
-        metadata = PluginMetadata(
-            name="voxtral_vllm",
-            category="transcription",
-            title="Voxtral via vLLM",
-            config_schema={...},
-            execution_mode=PluginExecutionMode.SUBPROCESS,
-            manages_child_processes=True,
-            spawned_pids=[12345, 12346, 12347]
-        )
-        
-        # Cloud-based plugin
-        metadata = PluginMetadata(
-            name="llm_finetune_cloud",
-            category="finetuning",
-            title="Cloud LLM Finetuning",
-            config_schema={...},
-            execution_mode=PluginExecutionMode.CLOUD_GPU,
-            manages_external_resources=True,
-            remote_resource=RemoteResourceInfo(...)
-        )
-        ```
-    """
-    name: str
-    category: str
-    title: str
-    config_schema: Dict[str, Any]
-    description: Optional[str] = None
-    version: Optional[str] = None
-    is_configured: bool = False
+    """Metadata describing a plugin for display and resource management without loading the plugin instance."""
+    name: str  # Internal plugin identifier
+    category: str  # Plugin category string (application-defined)
+    title: str  # Display title for the plugin
+    config_schema: Dict[str, Any]  # JSON Schema for plugin configuration
+    description: Optional[str] = None  # Plugin description
+    version: Optional[str] = None  # Plugin version
+    is_configured: bool = False  # Whether the plugin has saved configuration
     
     # Lifecycle metadata
-    execution_mode: PluginExecutionMode = PluginExecutionMode.IN_PROCESS
-    manages_child_processes: bool = False
-    manages_external_resources: bool = False
+    execution_mode: PluginExecutionMode = PluginExecutionMode.IN_PROCESS  # How the plugin executes
+    manages_child_processes: bool = False  # Whether plugin spawns child processes
+    manages_external_resources: bool = False  # Whether plugin manages Docker/servers/etc.
     
     # Local resource tracking
-    spawned_pids: List[int] = field(default_factory=list)
-    container_id: Optional[str] = None
-    conda_env_name: Optional[str] = None
+    spawned_pids: List[int] = field(default_factory=list)  # List of child process PIDs
+    container_id: Optional[str] = None  # Docker container ID if applicable
+    conda_env_name: Optional[str] = None  # Conda environment name if applicable
     
     # Cloud/Remote resource tracking
-    remote_resource: Optional[RemoteResourceInfo] = None
+    remote_resource: Optional[RemoteResourceInfo] = None  # Remote resource information if applicable
     
-    def get_unique_id(self) -> str:
-        """Generate unique ID for this plugin.
-        
-        Returns:
-            String in format 'category_name'
-        """
+    def get_unique_id(self) -> str:  # String in format 'category_name'
+        """Generate unique ID for this plugin."""
         return f"{self.category}_{self.name}"
     
-    def is_local_execution(self) -> bool:
-        """Check if plugin executes locally (not cloud/remote).
-        
-        Returns:
-            True if execution is local
-        """
+    def is_local_execution(self) -> bool:  # True if execution is local
+        """Check if plugin executes locally (not cloud/remote)."""
         local_modes = {
             PluginExecutionMode.IN_PROCESS,
             PluginExecutionMode.SUBPROCESS,
@@ -160,20 +69,12 @@ class PluginMetadata:
         }
         return self.execution_mode in local_modes
     
-    def is_cloud_execution(self) -> bool:
-        """Check if plugin executes on cloud/remote resources.
-        
-        Returns:
-            True if execution is cloud/remote
-        """
+    def is_cloud_execution(self) -> bool:  # True if execution is cloud/remote
+        """Check if plugin executes on cloud/remote resources."""
         return not self.is_local_execution()
     
-    def has_active_resources(self) -> bool:
-        """Check if plugin has active managed resources.
-        
-        Returns:
-            True if plugin has child processes, containers, or cloud resources
-        """
+    def has_active_resources(self) -> bool:  # True if plugin has child processes, containers, or cloud resources
+        """Check if plugin has active managed resources."""
         return bool(
             self.spawned_pids or
             self.container_id or

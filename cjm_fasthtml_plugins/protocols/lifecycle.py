@@ -13,104 +13,33 @@ from ..core.execution_mode import PluginExecutionMode
 # %% ../../nbs/protocols/lifecycle.ipynb 5
 @runtime_checkable
 class LifecycleAwarePlugin(Protocol):
-    """Protocol for plugins that manage external resources.
+    """Protocol for plugins that manage external resources like child processes, containers, or cloud resources."""
     
-    Plugins implementing this protocol provide information about
-    child processes, containers, or other resources they manage.
-    
-    This enables:
-    - Resource tracking across the application
-    - Proper cleanup when stopping plugins
-    - Conflict detection for GPU/memory usage
-    - Cost tracking for cloud resources
-    
-    Example:
-        ```python
-        class VoxtralVLLMPlugin(TranscriptionPlugin, LifecycleAwarePlugin):
-            def get_execution_mode(self) -> PluginExecutionMode:
-                return PluginExecutionMode.SUBPROCESS
-            
-            def get_child_pids(self) -> List[int]:
-                if not self.server or not self.server.process:
-                    return []
-                return [self.server.process.pid]
-            
-            def get_managed_resources(self) -> Dict[str, Any]:
-                return {
-                    'server_url': self.server.base_url,
-                    'is_running': self.server.is_running()
-                }
-            
-            def force_cleanup(self) -> None:
-                if self.server:
-                    self.server.stop()
-        ```
-    """
-    
-    def get_execution_mode(self) -> PluginExecutionMode:
-        """Get the execution mode of this plugin.
-        
-        Returns:
-            PluginExecutionMode indicating how this plugin executes
-        """
+    def get_execution_mode(self) -> PluginExecutionMode:  # PluginExecutionMode indicating how this plugin executes
+        """Get the execution mode of this plugin."""
         ...
     
-    def get_child_pids(self) -> List[int]:
-        """Get PIDs of any child processes managed by this plugin.
-        
-        For plugins that spawn subprocesses (e.g., vLLM servers), this
-        should return all child process PIDs for resource tracking.
-        
-        Returns:
-            List of process IDs (empty list if no child processes)
-        """
+    def get_child_pids(self) -> List[int]:  # List of process IDs (empty list if no child processes)
+        """Get PIDs of any child processes managed by this plugin."""
         ...
     
-    def get_managed_resources(self) -> Dict[str, Any]:
-        """Get information about managed resources.
-        
-        This can include:
-        - Server URLs and ports
-        - Container IDs
-        - Conda environment names
-        - Status information
-        - Any other plugin-specific resource info
-        
-        Returns:
-            Dictionary with resource information
-        """
+    def get_managed_resources(self) -> Dict[str, Any]:  # Dictionary with resource information
+        """Get information about managed resources (server URLs, container IDs, conda envs, etc.)."""
         ...
     
     def force_cleanup(self) -> None:
-        """Force cleanup of all managed resources.
-        
-        This should be more aggressive than regular cleanup(),
-        killing processes, stopping containers, etc. Used for
-        emergency shutdown scenarios.
-        """
+        """Force cleanup of all managed resources (kill processes, stop containers, etc.)."""
         ...
 
 # %% ../../nbs/protocols/lifecycle.ipynb 10
-def is_lifecycle_aware(plugin: Any) -> bool:
-    """Check if a plugin implements the LifecycleAwarePlugin protocol.
-    
-    Args:
-        plugin: Plugin instance to check
-    
-    Returns:
-        True if plugin implements the protocol
-    """
+def is_lifecycle_aware(plugin: Any  # Plugin instance to check
+                      ) -> bool:  # True if plugin implements the protocol
+    """Check if a plugin implements the LifecycleAwarePlugin protocol."""
     return isinstance(plugin, LifecycleAwarePlugin)
 
-def get_all_managed_pids(plugin: Any) -> List[int]:
-    """Get all PIDs managed by a plugin (including children).
-    
-    Args:
-        plugin: Plugin instance
-    
-    Returns:
-        List of all PIDs (empty if plugin not lifecycle-aware)
-    """
+def get_all_managed_pids(plugin: Any  # Plugin instance
+                        ) -> List[int]:  # List of all PIDs (empty if plugin not lifecycle-aware)
+    """Get all PIDs managed by a plugin (including children)."""
     if not is_lifecycle_aware(plugin):
         return []
     

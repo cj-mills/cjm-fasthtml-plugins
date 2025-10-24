@@ -16,71 +16,33 @@ def filter_plugins_by_execution_mode(
     plugins: List[PluginMetadata],  # List of plugin metadata
     mode: PluginExecutionMode  # Execution mode to filter by
 ) -> List[PluginMetadata]:  # Filtered list
-    """Filter plugins by execution mode.
-    
-    Args:
-        plugins: List of plugin metadata
-        mode: Execution mode to filter by
-    
-    Returns:
-        List of plugins matching the execution mode
-    """
+    """Filter plugins by execution mode."""
     return [p for p in plugins if p.execution_mode == mode]
 
-def get_cloud_plugins(plugins: List[PluginMetadata]) -> List[PluginMetadata]:
-    """Get all cloud/remote execution plugins.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        List of cloud/remote plugins
-    """
+def get_cloud_plugins(plugins: List[PluginMetadata]  # List of plugin metadata
+                     ) -> List[PluginMetadata]:  # List of cloud/remote plugins
+    """Get all cloud/remote execution plugins."""
     return [p for p in plugins if p.is_cloud_execution()]
 
-def get_local_plugins(plugins: List[PluginMetadata]) -> List[PluginMetadata]:
-    """Get all local execution plugins.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        List of local plugins
-    """
+def get_local_plugins(plugins: List[PluginMetadata]  # List of plugin metadata
+                     ) -> List[PluginMetadata]:  # List of local plugins
+    """Get all local execution plugins."""
     return [p for p in plugins if p.is_local_execution()]
 
-def get_configured_plugins(plugins: List[PluginMetadata]) -> List[PluginMetadata]:
-    """Get plugins that have saved configuration.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        List of configured plugins
-    """
+def get_configured_plugins(plugins: List[PluginMetadata]  # List of plugin metadata
+                          ) -> List[PluginMetadata]:  # List of configured plugins
+    """Get plugins that have saved configuration."""
     return [p for p in plugins if p.is_configured]
 
-def get_unconfigured_plugins(plugins: List[PluginMetadata]) -> List[PluginMetadata]:
-    """Get plugins that need configuration.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        List of unconfigured plugins
-    """
+def get_unconfigured_plugins(plugins: List[PluginMetadata]  # List of plugin metadata
+                            ) -> List[PluginMetadata]:  # List of unconfigured plugins
+    """Get plugins that need configuration."""
     return [p for p in plugins if not p.is_configured]
 
 # %% ../../nbs/utils/helpers.ipynb 8
-def get_plugin_stats(plugins: List[PluginMetadata]) -> Dict[str, Any]:
-    """Get statistics about a list of plugins.
-    
-    Args:
-        plugins: List of plugin metadata
-    
-    Returns:
-        Dictionary with plugin statistics
-    """
+def get_plugin_stats(plugins: List[PluginMetadata]  # List of plugin metadata
+                    ) -> Dict[str, Any]:  # Dictionary with plugin statistics
+    """Get statistics about a list of plugins."""
     return {
         "total": len(plugins),
         "configured": len([p for p in plugins if p.is_configured]),

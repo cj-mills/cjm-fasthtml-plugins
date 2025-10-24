@@ -13,108 +13,41 @@ from ..core.metadata import RemoteResourceInfo
 # %% ../../nbs/protocols/cloud_aware.ipynb 5
 @runtime_checkable
 class CloudAwarePlugin(Protocol):
-    """Protocol for plugins that use cloud/remote resources.
+    """Protocol for plugins that use cloud/remote resources."""
     
-    Plugins implementing this protocol provide information about
-    cloud resources they use, enabling cost tracking, resource
-    management, and emergency shutdown.
-    
-    Example:
-        ```python
-        class CloudFinetunePlugin(FinetuningPlugin, CloudAwarePlugin):
-            def get_remote_resource_info(self) -> Optional[RemoteResourceInfo]:
-                if not self.remote_instance:
-                    return None
-                return RemoteResourceInfo(
-                    provider=CloudProviderType.AWS,
-                    instance_id=self.instance_id,
-                    status="running",
-                    gpu_count=8,
-                    estimated_cost_per_hour=24.50
-                )
-            
-            def provision_remote_resource(self, **config) -> RemoteResourceInfo:
-                # Launch EC2 instance
-                return self.remote_resource_info
-            
-            def terminate_remote_resource(self) -> bool:
-                # Terminate EC2 instance
-                return True
-            
-            def estimate_cost(self, duration_hours: float) -> float:
-                return duration_hours * 24.50
-        ```
-    """
-    
-    def get_remote_resource_info(self) -> Optional[RemoteResourceInfo]:
-        """Get information about remote/cloud resources.
-        
-        Returns:
-            RemoteResourceInfo if resources are provisioned, None otherwise
-        """
+    def get_remote_resource_info(self) -> Optional[RemoteResourceInfo]:  # RemoteResourceInfo if resources are provisioned, None otherwise
+        """Get information about remote/cloud resources."""
         ...
     
-    def provision_remote_resource(self, **config) -> RemoteResourceInfo:
-        """Provision cloud resources (VM, container, etc.).
-        
-        Args:
-            **config: Provider-specific configuration
-        
-        Returns:
-            RemoteResourceInfo with details about provisioned resource
-        """
+    def provision_remote_resource(self, **config) -> RemoteResourceInfo:  # RemoteResourceInfo with details about provisioned resource
+        """Provision cloud resources (VM, container, etc.)."""
         ...
     
-    def check_remote_resource_status(self) -> str:
-        """Check status of remote resource.
-        
-        Returns:
-            Status string (e.g., 'running', 'stopped', 'provisioning')
-        """
+    def check_remote_resource_status(self) -> str:  # Status string (e.g., 'running', 'stopped', 'provisioning')
+        """Check status of remote resource."""
         ...
     
-    def terminate_remote_resource(self) -> bool:
-        """Terminate/stop cloud resources to avoid costs.
-        
-        Returns:
-            True if termination succeeded
-        """
+    def terminate_remote_resource(self) -> bool:  # True if termination succeeded
+        """Terminate/stop cloud resources to avoid costs."""
         ...
     
-    def estimate_cost(self, duration_hours: float) -> float:
-        """Estimate cost for running this duration.
-        
-        Args:
-            duration_hours: Estimated runtime in hours
-        
-        Returns:
-            Estimated cost in USD
-        """
+    def estimate_cost(self, 
+                     duration_hours: float  # Estimated runtime in hours
+                    ) -> float:  # Estimated cost in USD
+        """Estimate cost for running this duration."""
         ...
 
 # %% ../../nbs/protocols/cloud_aware.ipynb 10
 from typing import Any, List
 
-def is_cloud_aware(plugin: Any) -> bool:
-    """Check if a plugin implements the CloudAwarePlugin protocol.
-    
-    Args:
-        plugin: Plugin instance to check
-    
-    Returns:
-        True if plugin implements the protocol
-    """
+def is_cloud_aware(plugin: Any  # Plugin instance to check
+                  ) -> bool:  # True if plugin implements the protocol
+    """Check if a plugin implements the CloudAwarePlugin protocol."""
     return isinstance(plugin, CloudAwarePlugin)
 
-def has_active_cloud_resources(plugin: Any) -> bool:
-    """Check if plugin has active cloud resources.
-    
-    Args:
-        plugin: Plugin instance
-    
-    Returns:
-        True if plugin has running cloud resources
-    """
+def has_active_cloud_resources(plugin: Any  # Plugin instance
+                               ) -> bool:  # True if plugin has running cloud resources
+    """Check if plugin has active cloud resources."""
     if not is_cloud_aware(plugin):
         return False
     
@@ -124,16 +57,10 @@ def has_active_cloud_resources(plugin: Any) -> bool:
     
     return resource_info.status == "running"
 
-def get_total_estimated_cost(plugins: List[Any], duration_hours: float = 1.0) -> float:
-    """Get total estimated cost for multiple plugins.
-    
-    Args:
-        plugins: List of plugin instances
-        duration_hours: Duration to estimate for
-    
-    Returns:
-        Total estimated cost in USD
-    """
+def get_total_estimated_cost(plugins: List[Any],  # List of plugin instances
+                            duration_hours: float = 1.0  # Duration to estimate for
+                           ) -> float:  # Total estimated cost in USD
+    """Get total estimated cost for multiple plugins."""
     total = 0.0
     for plugin in plugins:
         if is_cloud_aware(plugin) and has_active_cloud_resources(plugin):

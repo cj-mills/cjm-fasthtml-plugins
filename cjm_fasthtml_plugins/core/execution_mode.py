@@ -10,21 +10,7 @@ from enum import Enum
 
 # %% ../../nbs/core/execution_mode.ipynb 5
 class PluginExecutionMode(Enum):
-    """How a plugin executes.
-    
-    This enum categorizes plugins by their execution environment,
-    from simple in-process execution to complex cloud deployments.
-    
-    Examples:
-        >>> # Simple in-process plugin
-        >>> mode = PluginExecutionMode.IN_PROCESS
-        >>> 
-        >>> # Plugin that spawns subprocesses (like vLLM server)
-        >>> mode = PluginExecutionMode.SUBPROCESS
-        >>> 
-        >>> # Plugin running on cloud GPU
-        >>> mode = PluginExecutionMode.CLOUD_GPU
-    """
+    """Categorizes plugins by their execution environment, from in-process to cloud deployments."""
     IN_PROCESS = "in_process"          # Runs in same process
     SUBPROCESS = "subprocess"           # Spawns subprocess(es)
     DOCKER = "docker"                   # Runs in Docker container
@@ -41,20 +27,7 @@ class PluginExecutionMode(Enum):
 
 # %% ../../nbs/core/execution_mode.ipynb 9
 class CloudProviderType(Enum):
-    """Supported cloud providers.
-    
-    Identifies which cloud provider or GPU rental service is being used
-    for remote execution.
-    
-    Examples:
-        >>> # Major cloud providers
-        >>> provider = CloudProviderType.AWS
-        >>> provider = CloudProviderType.GCP
-        >>> 
-        >>> # GPU rental services
-        >>> provider = CloudProviderType.LAMBDA_LABS
-        >>> provider = CloudProviderType.RUNPOD
-    """
+    """Cloud providers and GPU rental services for remote execution."""
     AWS = "aws"
     GCP = "gcp"
     AZURE = "azure"
