@@ -38,8 +38,8 @@ graph LR
     core_metadata --> core_execution_mode
     core_registry --> core_metadata
     core_registry --> core_execution_mode
-    protocols_cloud_aware --> core_execution_mode
     protocols_cloud_aware --> core_metadata
+    protocols_cloud_aware --> core_execution_mode
     protocols_lifecycle --> core_execution_mode
     utils_helpers --> core_metadata
     utils_helpers --> core_execution_mode
@@ -382,7 +382,7 @@ from cjm_fasthtml_plugins.core.registry import (
 
 #### Classes
 
-``` python
+```` python
 class UnifiedPluginRegistry:
     def __init__(self, 
                  config_dir: Optional[Path] = None  # Directory for plugin configuration files (default: 'configs')
@@ -402,6 +402,39 @@ class UnifiedPluginRegistry:
             auto_discover: bool = True  # Automatically discover plugins?
         ) -> List[PluginMetadata]:  # List of discovered plugin metadata
         "Register a domain-specific plugin manager."
+    
+    def register_plugin_system(
+            self,
+            category: str,  # Category name (e.g., "transcription", "llm")
+            plugin_interface: Type,  # Plugin interface class (e.g., TranscriptionPlugin)
+            display_name: Optional[str] = None,  # Display name for UI
+            auto_discover: bool = True  # Automatically discover plugins?
+        ) -> List[PluginMetadata]:  # List of discovered plugin metadata
+        "Create and register a plugin system in one step.
+
+This is a convenience method that creates a PluginManager with the
+specified interface and registers it with the registry.
+
+Example:
+    ```python
+    from cjm_transcription_plugin_system.plugin_interface import TranscriptionPlugin
+    
+    registry = UnifiedPluginRegistry()
+    
+    # Instead of:
+    # manager = PluginManager(plugin_interface=TranscriptionPlugin)
+    # registry.register_plugin_manager(category="transcription", manager=manager)
+    
+    # Do this:
+    registry.register_plugin_system(
+        category="transcription",
+        plugin_interface=TranscriptionPlugin,
+        display_name="Transcription"
+    )
+    ```
+
+Returns:
+    List of discovered plugin metadata"
     
     def get_manager(
             self,
@@ -466,7 +499,7 @@ class UnifiedPluginRegistry:
                                 unique_id: str  # Plugin unique identifier
                                ) -> bool:  # True if deletion succeeded, False otherwise
         "Delete saved configuration for a plugin."
-```
+````
 
 #### Variables
 

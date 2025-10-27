@@ -44,6 +44,50 @@ class UnifiedPluginRegistry:
             return self._discover_and_register_plugins(category, manager)
         return []
     
+    def register_plugin_system(
+        self,
+        category: str,  # Category name (e.g., "transcription", "llm")
+        plugin_interface: Type,  # Plugin interface class (e.g., TranscriptionPlugin)
+        display_name: Optional[str] = None,  # Display name for UI
+        auto_discover: bool = True  # Automatically discover plugins?
+    ) -> List[PluginMetadata]:  # List of discovered plugin metadata
+        """
+        Create and register a plugin system in one step.
+        
+        This is a convenience method that creates a PluginManager with the
+        specified interface and registers it with the registry.
+        
+        Example:
+            ```python
+            from cjm_transcription_plugin_system.plugin_interface import TranscriptionPlugin
+            
+            registry = UnifiedPluginRegistry()
+            
+            # Instead of:
+            # manager = PluginManager(plugin_interface=TranscriptionPlugin)
+            # registry.register_plugin_manager(category="transcription", manager=manager)
+            
+            # Do this:
+            registry.register_plugin_system(
+                category="transcription",
+                plugin_interface=TranscriptionPlugin,
+                display_name="Transcription"
+            )
+            ```
+        
+        Returns:
+            List of discovered plugin metadata
+        """
+        from cjm_plugin_system.core.manager import PluginManager
+        
+        manager = PluginManager(plugin_interface=plugin_interface)
+        return self.register_plugin_manager(
+            category=category,
+            manager=manager,
+            display_name=display_name,
+            auto_discover=auto_discover
+        )
+    
     def _discover_and_register_plugins(
         self,
         category: str,  # Category name
