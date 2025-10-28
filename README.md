@@ -44,13 +44,13 @@ graph LR
     components_selector --> components_html_ids
     components_selector --> core_metadata
     core_metadata --> core_execution_mode
-    core_registry --> core_execution_mode
     core_registry --> core_metadata
-    protocols_cloud_aware --> core_execution_mode
+    core_registry --> core_execution_mode
     protocols_cloud_aware --> core_metadata
+    protocols_cloud_aware --> core_execution_mode
     protocols_lifecycle --> core_execution_mode
-    utils_helpers --> core_execution_mode
     utils_helpers --> core_metadata
+    utils_helpers --> core_execution_mode
 ```
 
 *11 cross-module dependencies detected*
@@ -594,13 +594,20 @@ def render_plugin_details(
 def render_dropdown_selector(
     plugins: List[PluginMetadata],  # Available plugins
     selected_plugin_id: Optional[str] = None,  # Currently selected plugin ID
-    selection_endpoint: str = None,  # HTMX endpoint for selection change
-    target_id: str = None,  # HTMX target element ID
+    selection_endpoint: str = None,  # HTMX endpoint for confirming selection
+    details_endpoint: Optional[str] = None,  # HTMX endpoint for updating details (optional)
+    target_id: str = None,  # HTMX target element ID for final selection
     label: str = "Select Plugin",  # Label for the dropdown
+    confirm_button_text: str = "Continue with Selected Plugin",  # Text for confirmation button
     get_plugin_config: Optional[Callable[[str], Dict[str, Any]]] = None,  # Function to get plugin config
     show_comparison_toggle: bool = True  # Whether to show comparison table toggle
 ) -> FT:  # Complete plugin selector UI
-    "Render plugin selector with dropdown and details panel."
+    """
+    Render plugin selector with dropdown and details panel.
+    
+    The dropdown updates the details panel for browsing, while an explicit
+    button confirms the selection and proceeds to the next step.
+    """
 ```
 
 ``` python

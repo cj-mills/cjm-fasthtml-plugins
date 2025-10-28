@@ -9,6 +9,7 @@ __all__ = ['format_execution_mode', 'get_execution_badge_color', 'extract_plugin
 # %% ../../nbs/components/selector.ipynb 3
 from typing import List, Dict, Any, Optional, Callable
 from fasthtml.common import *
+from cjm_fasthtml_daisyui.components.actions.button import btn, btn_colors
 from cjm_fasthtml_daisyui.components.data_input.select import select as dui_select
 from cjm_fasthtml_daisyui.components.data_display.card import card, card_body, card_title
 from cjm_fasthtml_daisyui.components.data_display.badge import badge, badge_colors, badge_sizes
@@ -191,13 +192,19 @@ def render_plugin_details(
 def render_dropdown_selector(
     plugins: List[PluginMetadata],  # Available plugins
     selected_plugin_id: Optional[str] = None,  # Currently selected plugin ID
-    selection_endpoint: str = None,  # HTMX endpoint for selection change
-    target_id: str = None,  # HTMX target element ID
+    selection_endpoint: str = None,  # HTMX endpoint for confirming selection
+    details_endpoint: Optional[str] = None,  # HTMX endpoint for updating details (optional)
+    target_id: str = None,  # HTMX target element ID for final selection
     label: str = "Select Plugin",  # Label for the dropdown
+    confirm_button_text: str = "Continue with Selected Plugin",  # Text for confirmation button
     get_plugin_config: Optional[Callable[[str], Dict[str, Any]]] = None,  # Function to get plugin config
     show_comparison_toggle: bool = True  # Whether to show comparison table toggle
 ) -> FT:  # Complete plugin selector UI
-    """Render plugin selector with dropdown and details panel."""
+    """Render plugin selector with dropdown and details panel.
+    
+    The dropdown updates the details panel for browsing, while an explicit
+    button confirms the selection and proceeds to the next step.
+    """
     
     if not plugins:
         return P(
@@ -219,22 +226,25 @@ def render_dropdown_selector(
     # If no selection, default to first plugin
     if not selected_plugin and plugins:
         selected_plugin = plugins[0]
+        selected_plugin_id = selected_plugin.get_unique_id()
         if get_plugin_config:
             selected_config = get_plugin_config(selected_plugin.get_unique_id())
     
-    # Build HTMX attributes
+    # Build dropdown attributes for updating details only
     select_attrs = {
         "name": "plugin_id",
         "id": HtmlIds.PLUGIN_SELECT,
         "cls": combine_classes(dui_select, w.full)
     }
     
-    if selection_endpoint and target_id:
+    # If details_endpoint provided, use it to update details on change
+    if details_endpoint:
         select_attrs.update({
-            "hx_post": selection_endpoint,
-            "hx_target": f"#{target_id}",
-            "hx_swap": "innerHTML",
-            "hx_trigger": "change"
+            "hx_get": details_endpoint,
+            "hx_target": HtmlIds.as_selector(HtmlIds.PLUGIN_DETAILS),
+            "hx_swap": "outerHTML",
+            "hx_trigger": "change",
+            "hx_include": f"#{HtmlIds.PLUGIN_SELECT}"
         })
     
     return Div(
@@ -252,7 +262,7 @@ def render_dropdown_selector(
                     Option(
                         plugin.title,
                         value=plugin.get_unique_id(),
-                        selected=(plugin.get_unique_id() == (selected_plugin.get_unique_id() if selected_plugin else None))
+                        selected=(plugin.get_unique_id() == selected_plugin_id)
                     )
                     for plugin in plugins
                 ],
@@ -263,6 +273,24 @@ def render_dropdown_selector(
         
         # Details panel
         render_plugin_details(selected_plugin, selected_config) if selected_plugin else None,
+        
+        # Confirmation button
+        Div(
+            Button(
+                confirm_button_text,
+                hx_post=selection_endpoint if selection_endpoint else "#",
+                hx_target=f"#{target_id}" if target_id else None,
+                hx_swap="innerHTML",
+                hx_include=f"#{HtmlIds.PLUGIN_SELECT}",
+                cls=combine_classes(
+                    btn,
+                    btn_colors.primary,
+                    btn_sizes.md,
+                    m.t(4)
+                )
+            ),
+            cls=str(m.t(4))
+        ) if selection_endpoint and target_id else None,
         
         # Optional comparison toggle
         Div(
@@ -275,11 +303,11 @@ def render_dropdown_selector(
                     btn,
                     btn_styles.outline,
                     btn_sizes.sm,
-                    m.t(4)
+                    m.t(2)
                 )
             ),
-            cls=str(m.t(4))
-        ) if show_comparison_toggle else None,
+            cls=str(m.t(2))
+        ) if show_comparison_toggle and selection_endpoint else None,
         
         # Comparison container
         Div(id=HtmlIds.PLUGIN_COMPARISON, cls=str(m.t(4))) if show_comparison_toggle else None,
