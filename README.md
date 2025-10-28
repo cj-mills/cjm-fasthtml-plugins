@@ -12,6 +12,9 @@ pip install cjm_fasthtml_plugins
 ## Project Structure
 
     nbs/
+    ├── components/ (2)
+    │   ├── html_ids.ipynb  # Centralized HTML ID constants for plugin selector components
+    │   └── selector.ipynb  # Reusable plugin selection UI components with multiple display strategies
     ├── core/ (3)
     │   ├── execution_mode.ipynb  # Enum definitions for plugin execution modes (in-process, subprocess, Docker, cloud, etc.)
     │   ├── metadata.ipynb        # Plugin metadata structures for tracking plugin information and resources
@@ -22,12 +25,14 @@ pip install cjm_fasthtml_plugins
     └── utils/ (1)
         └── helpers.ipynb  # Utility functions for plugin registry operations
 
-Total: 6 notebooks across 4 directories
+Total: 8 notebooks across 5 directories
 
 ## Module Dependencies
 
 ``` mermaid
 graph LR
+    components_html_ids[components.html_ids<br/>HTML IDs]
+    components_selector[components.selector<br/>Plugin Selector]
     core_execution_mode[core.execution_mode<br/>Execution Mode]
     core_metadata[core.metadata<br/>Metadata]
     core_registry[core.registry<br/>Registry]
@@ -35,17 +40,20 @@ graph LR
     protocols_lifecycle[protocols.lifecycle<br/>Lifecycle Protocol]
     utils_helpers[utils.helpers<br/>Helpers]
 
+    components_selector --> core_execution_mode
+    components_selector --> components_html_ids
+    components_selector --> core_metadata
     core_metadata --> core_execution_mode
-    core_registry --> core_metadata
     core_registry --> core_execution_mode
-    protocols_cloud_aware --> core_metadata
+    core_registry --> core_metadata
     protocols_cloud_aware --> core_execution_mode
+    protocols_cloud_aware --> core_metadata
     protocols_lifecycle --> core_execution_mode
-    utils_helpers --> core_metadata
     utils_helpers --> core_execution_mode
+    utils_helpers --> core_metadata
 ```
 
-*8 cross-module dependencies detected*
+*11 cross-module dependencies detected*
 
 ## CLI Reference
 
@@ -215,6 +223,30 @@ def get_unconfigured_plugins(plugins: List[PluginMetadata]  # List of plugin met
 def get_plugin_stats(plugins: List[PluginMetadata]  # List of plugin metadata
                     ) -> Dict[str, Any]:  # Dictionary with plugin statistics
     "Get statistics about a list of plugins."
+```
+
+### HTML IDs (`html_ids.ipynb`)
+
+> Centralized HTML ID constants for plugin selector components
+
+#### Import
+
+``` python
+from cjm_fasthtml_plugins.components.html_ids import (
+    PluginSelectorHtmlIds
+)
+```
+
+#### Classes
+
+``` python
+class PluginSelectorHtmlIds:
+    "HTML ID constants for plugin selector components."
+    
+    def as_selector(
+            id_str: str  # The HTML ID to convert
+        ) -> str:  # CSS selector with # prefix
+        "Convert an ID to a CSS selector format."
 ```
 
 ### Lifecycle Protocol (`lifecycle.ipynb`)
@@ -505,4 +537,96 @@ Returns:
 
 ``` python
 T
+```
+
+### Plugin Selector (`selector.ipynb`)
+
+> Reusable plugin selection UI components with multiple display
+> strategies
+
+#### Import
+
+``` python
+from cjm_fasthtml_plugins.components.selector import (
+    format_execution_mode,
+    get_execution_badge_color,
+    extract_plugin_features,
+    render_plugin_details,
+    render_dropdown_selector,
+    render_comparison_table,
+    render_plugin_selector
+)
+```
+
+#### Functions
+
+``` python
+def format_execution_mode(
+    mode: PluginExecutionMode  # Execution mode enum
+) -> str:  # Human-readable string
+    "Format execution mode for display."
+```
+
+``` python
+def get_execution_badge_color(
+    mode: PluginExecutionMode  # Execution mode enum
+) -> str:  # DaisyUI badge color class
+    "Get badge color for execution mode."
+```
+
+``` python
+def extract_plugin_features(
+    plugin: PluginMetadata,  # Plugin metadata
+    config: Optional[Dict[str, Any]] = None  # Optional plugin configuration
+) -> List[tuple]:  # List of (label, value, badge_color) tuples
+    "Extract key features from plugin metadata for display."
+```
+
+``` python
+def render_plugin_details(
+    plugin: PluginMetadata,  # Plugin to display
+    config: Optional[Dict[str, Any]] = None  # Optional plugin configuration
+) -> FT:  # Card element with plugin details
+    "Render detailed information about a plugin."
+```
+
+``` python
+def render_dropdown_selector(
+    plugins: List[PluginMetadata],  # Available plugins
+    selected_plugin_id: Optional[str] = None,  # Currently selected plugin ID
+    selection_endpoint: str = None,  # HTMX endpoint for selection change
+    target_id: str = None,  # HTMX target element ID
+    label: str = "Select Plugin",  # Label for the dropdown
+    get_plugin_config: Optional[Callable[[str], Dict[str, Any]]] = None,  # Function to get plugin config
+    show_comparison_toggle: bool = True  # Whether to show comparison table toggle
+) -> FT:  # Complete plugin selector UI
+    "Render plugin selector with dropdown and details panel."
+```
+
+``` python
+def render_comparison_table(
+    plugins: List[PluginMetadata],  # Plugins to compare
+    selected_plugin_id: Optional[str] = None,  # Currently selected plugin ID
+    get_plugin_config: Optional[Callable[[str], Dict[str, Any]]] = None  # Function to get plugin config
+) -> FT:  # Table element with plugin comparison
+    "Render a comparison table of all plugins."
+```
+
+``` python
+def render_plugin_selector(
+    plugins: List[PluginMetadata],  # Available plugins
+    selected_plugin_id: Optional[str] = None,  # Currently selected plugin ID
+    selection_endpoint: str = None,  # HTMX endpoint for selection
+    target_id: str = None,  # HTMX target element ID
+    strategy: str = "dropdown",  # UI strategy: "dropdown" or "comparison"
+    get_plugin_config: Optional[Callable[[str], Dict[str, Any]]] = None,  # Function to get plugin config
+    **kwargs  # Additional strategy-specific options
+) -> FT:  # Plugin selector UI
+    """
+    Render plugin selector with the specified UI strategy.
+    
+    Strategies:
+    - "dropdown": Dropdown selector with details panel (default)
+    - "comparison": Comparison table of all plugins
+    """
 ```

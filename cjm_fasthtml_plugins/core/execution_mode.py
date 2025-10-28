@@ -23,6 +23,7 @@ class PluginExecutionMode(Enum):
     CLOUD_CONTAINER = "cloud_container" # Cloud container service (ECS, Cloud Run, etc.)
     CLOUD_SERVERLESS = "cloud_serverless" # Serverless (Lambda, Cloud Functions, etc.)
     CLOUD_GPU = "cloud_gpu"            # Cloud GPU service (SageMaker, Vertex AI, etc.)
+    CLOUD_CPU = "cloud_cpu"            # Cloud CPU service
     KUBERNETES = "kubernetes"          # Kubernetes cluster
 
 # %% ../../nbs/core/execution_mode.ipynb 9
