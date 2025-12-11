@@ -12,6 +12,7 @@ from typing import Dict, List, Optional, Any, TypeVar, Type
 
 from .metadata import PluginMetadata
 from .execution_mode import PluginExecutionMode
+from cjm_fasthtml_jsonschema.core.dataclass import dataclass_to_jsonschema
 
 # %% ../../nbs/core/registry.ipynb 5
 T = TypeVar('T')
@@ -98,8 +99,18 @@ class UnifiedPluginRegistry:
         plugin_metadatas = []
         
         for plugin_data in discovered:
-            # Get config schema from manager
-            config_schema = manager.get_plugin_config_schema(plugin_data.name)
+            # Get config dataclass type from manager and convert to JSON schema
+            config_class = manager.get_plugin_config_class(plugin_data.name)
+            
+            if config_class is not None:
+                config_schema = dataclass_to_jsonschema(config_class)
+            else:
+                # Fallback for plugins without config_class
+                config_schema = {
+                    "type": "object",
+                    "title": plugin_data.name,
+                    "properties": {}
+                }
             
             # Create plugin metadata
             metadata = PluginMetadata(
@@ -107,6 +118,7 @@ class UnifiedPluginRegistry:
                 category=category,
                 title=config_schema.get('title', plugin_data.name),
                 config_schema=config_schema,
+                config_class=config_class,
                 version=plugin_data.version,
                 description=config_schema.get('description')
             )

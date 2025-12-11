@@ -7,7 +7,7 @@ __all__ = ['RemoteResourceInfo', 'PluginMetadata']
 
 # %% ../../nbs/core/metadata.ipynb 3
 from dataclasses import dataclass, field
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Type
 
 from .execution_mode import PluginExecutionMode, CloudProviderType
 
@@ -36,7 +36,8 @@ class PluginMetadata:
     name: str  # Internal plugin identifier
     category: str  # Plugin category string (application-defined)
     title: str  # Display title for the plugin
-    config_schema: Dict[str, Any]  # JSON Schema for plugin configuration
+    config_schema: Dict[str, Any]  # JSON Schema for plugin configuration (auto-generated from config_class)
+    config_class: Optional[Type] = None  # Configuration dataclass type (if available)
     description: Optional[str] = None  # Plugin description
     version: Optional[str] = None  # Plugin version
     is_configured: bool = False  # Whether the plugin has saved configuration

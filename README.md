@@ -40,17 +40,17 @@ graph LR
     protocols_lifecycle[protocols.lifecycle<br/>Lifecycle Protocol]
     utils_helpers[utils.helpers<br/>Helpers]
 
-    components_selector --> core_execution_mode
     components_selector --> components_html_ids
     components_selector --> core_metadata
+    components_selector --> core_execution_mode
     core_metadata --> core_execution_mode
     core_registry --> core_metadata
     core_registry --> core_execution_mode
     protocols_cloud_aware --> core_metadata
     protocols_cloud_aware --> core_execution_mode
     protocols_lifecycle --> core_execution_mode
-    utils_helpers --> core_metadata
     utils_helpers --> core_execution_mode
+    utils_helpers --> core_metadata
 ```
 
 *11 cross-module dependencies detected*
@@ -354,7 +354,8 @@ class PluginMetadata:
     name: str  # Internal plugin identifier
     category: str  # Plugin category string (application-defined)
     title: str  # Display title for the plugin
-    config_schema: Dict[str, Any]  # JSON Schema for plugin configuration
+    config_schema: Dict[str, Any]  # JSON Schema for plugin configuration (auto-generated from config_class)
+    config_class: Optional[Type]  # Configuration dataclass type (if available)
     description: Optional[str]  # Plugin description
     version: Optional[str]  # Plugin version
     is_configured: bool = False  # Whether the plugin has saved configuration
