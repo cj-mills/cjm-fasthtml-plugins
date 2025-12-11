@@ -53,31 +53,8 @@ class UnifiedPluginRegistry:
         auto_discover: bool = True  # Automatically discover plugins?
     ) -> List[PluginMetadata]:  # List of discovered plugin metadata
         """
-        Create and register a plugin system in one step.
-        
-        This is a convenience method that creates a PluginManager with the
+        Create and register a plugin system in one step. This is a convenience method that creates a PluginManager with the
         specified interface and registers it with the registry.
-        
-        Example:
-            ```python
-            from cjm_transcription_plugin_system.plugin_interface import TranscriptionPlugin
-            
-            registry = UnifiedPluginRegistry()
-            
-            # Instead of:
-            # manager = PluginManager(plugin_interface=TranscriptionPlugin)
-            # registry.register_plugin_manager(category="transcription", manager=manager)
-            
-            # Do this:
-            registry.register_plugin_system(
-                category="transcription",
-                plugin_interface=TranscriptionPlugin,
-                display_name="Transcription"
-            )
-            ```
-        
-        Returns:
-            List of discovered plugin metadata
         """
         from cjm_plugin_system.core.manager import PluginManager
         
@@ -100,17 +77,9 @@ class UnifiedPluginRegistry:
         
         for plugin_data in discovered:
             # Get config dataclass type from manager and convert to JSON schema
-            config_class = manager.get_plugin_config_class(plugin_data.name)
+            config_dataclass = manager.get_plugin_config_dataclass(plugin_data.name)
             
-            if config_class is not None:
-                config_schema = dataclass_to_jsonschema(config_class)
-            else:
-                # Fallback for plugins without config_class
-                config_schema = {
-                    "type": "object",
-                    "title": plugin_data.name,
-                    "properties": {}
-                }
+            config_schema = dataclass_to_jsonschema(config_dataclass)
             
             # Create plugin metadata
             metadata = PluginMetadata(
@@ -118,7 +87,7 @@ class UnifiedPluginRegistry:
                 category=category,
                 title=config_schema.get('title', plugin_data.name),
                 config_schema=config_schema,
-                config_class=config_class,
+                config_dataclass=config_dataclass,
                 version=plugin_data.version,
                 description=config_schema.get('description')
             )

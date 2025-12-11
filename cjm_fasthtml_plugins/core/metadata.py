@@ -36,8 +36,8 @@ class PluginMetadata:
     name: str  # Internal plugin identifier
     category: str  # Plugin category string (application-defined)
     title: str  # Display title for the plugin
-    config_schema: Dict[str, Any]  # JSON Schema for plugin configuration (auto-generated from config_class)
-    config_class: Optional[Type] = None  # Configuration dataclass type (if available)
+    config_schema: Dict[str, Any]  # JSON Schema for plugin configuration (auto-generated from config_dataclass)
+    config_dataclass: Optional[Type] = None  # Configuration dataclass type (if available)
     description: Optional[str] = None  # Plugin description
     version: Optional[str] = None  # Plugin version
     is_configured: bool = False  # Whether the plugin has saved configuration

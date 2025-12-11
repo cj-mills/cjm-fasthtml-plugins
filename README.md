@@ -49,8 +49,8 @@ graph LR
     protocols_cloud_aware --> core_metadata
     protocols_cloud_aware --> core_execution_mode
     protocols_lifecycle --> core_execution_mode
-    utils_helpers --> core_execution_mode
     utils_helpers --> core_metadata
+    utils_helpers --> core_execution_mode
 ```
 
 *11 cross-module dependencies detected*
@@ -354,8 +354,8 @@ class PluginMetadata:
     name: str  # Internal plugin identifier
     category: str  # Plugin category string (application-defined)
     title: str  # Display title for the plugin
-    config_schema: Dict[str, Any]  # JSON Schema for plugin configuration (auto-generated from config_class)
-    config_class: Optional[Type]  # Configuration dataclass type (if available)
+    config_schema: Dict[str, Any]  # JSON Schema for plugin configuration (auto-generated from config_dataclass)
+    config_dataclass: Optional[Type]  # Configuration dataclass type (if available)
     description: Optional[str]  # Plugin description
     version: Optional[str]  # Plugin version
     is_configured: bool = False  # Whether the plugin has saved configuration
@@ -415,7 +415,7 @@ from cjm_fasthtml_plugins.core.registry import (
 
 #### Classes
 
-```` python
+``` python
 class UnifiedPluginRegistry:
     def __init__(self, 
                  config_dir: Optional[Path] = None  # Directory for plugin configuration files (default: 'configs')
@@ -443,31 +443,8 @@ class UnifiedPluginRegistry:
             display_name: Optional[str] = None,  # Display name for UI
             auto_discover: bool = True  # Automatically discover plugins?
         ) -> List[PluginMetadata]:  # List of discovered plugin metadata
-        "Create and register a plugin system in one step.
-
-This is a convenience method that creates a PluginManager with the
-specified interface and registers it with the registry.
-
-Example:
-    ```python
-    from cjm_transcription_plugin_system.plugin_interface import TranscriptionPlugin
-    
-    registry = UnifiedPluginRegistry()
-    
-    # Instead of:
-    # manager = PluginManager(plugin_interface=TranscriptionPlugin)
-    # registry.register_plugin_manager(category="transcription", manager=manager)
-    
-    # Do this:
-    registry.register_plugin_system(
-        category="transcription",
-        plugin_interface=TranscriptionPlugin,
-        display_name="Transcription"
-    )
-    ```
-
-Returns:
-    List of discovered plugin metadata"
+        "Create and register a plugin system in one step. This is a convenience method that creates a PluginManager with the
+specified interface and registers it with the registry."
     
     def get_manager(
             self,
@@ -532,7 +509,7 @@ Returns:
                                 unique_id: str  # Plugin unique identifier
                                ) -> bool:  # True if deletion succeeded, False otherwise
         "Delete saved configuration for a plugin."
-````
+```
 
 #### Variables
 
